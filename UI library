@@ -238,7 +238,7 @@ do
             Color = Library.Theme.Accent[1],
             Thickness = 1,
             Filled = false,
-            ZIndex = 60
+            ZIndex = 200000
         }, Library.Ignores)
         --
         local Cursor = Utility.AddDrawing("Triangle", {
@@ -246,7 +246,7 @@ do
             Thickness = 3,
             Filled = true,
             Transparency = 1,
-            ZIndex = 60
+            ZIndex = 200000
         }, Library.Ignores)
         --
         Utility.AddConnection(Library.Communication.Event, function(Type, Color)
