@@ -1,0 +1,25 @@
+-- 顯示通知的函數
+local function showNotification(title, text)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = title,    -- 通知標題
+        Text = text,      -- 通知內容
+        Icon = "",        -- 可以設置通知的圖標（通常可以是URL）
+        Duration = 5      -- 通知顯示的時間（秒）
+    })
+end
+
+-- 測試彈出通知
+showNotification("Version 1.0.0", "Click 'Z' or 'RightShift' to hide ui ")
+
+-- 顯示通知的函數
+local function showNotification(title, text)
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = title,    -- 通知標題
+        Text = text,      -- 通知內容
+        Icon = "",        -- 可以設置通知的圖標（通常可以是URL）
+        Duration = 5      -- 通知顯示的時間（秒）
+    })
+end
+
+-- 測試彈出通知
+showNotification("Version 1.0.0", "['Z' cant be change]")
