@@ -1,0 +1,144 @@
+-- 預設配置
+_G.FriendColor = Color3.fromRGB(0, 0, 255)
+_G.EnemyColor = Color3.fromRGB(255, 0, 0)
+_G.UseTeamColor = true
+
+-- 创建 ESP 的基础组件
+local Holder = Instance.new("Folder", game.CoreGui)
+Holder.Name = "ESP"
+
+local Box = Instance.new("BoxHandleAdornment")
+Box.Name = "nilBox"
+Box.Size = Vector3.new(1, 2, 1)
+Box.Color3 = Color3.new(100 / 255, 100 / 255, 100 / 255)
+Box.Transparency = 0.7
+Box.ZIndex = 0
+Box.AlwaysOnTop = false
+Box.Visible = false
+
+local NameTag = Instance.new("BillboardGui")
+NameTag.Name = "nilNameTag"
+NameTag.Enabled = false
+NameTag.Size = UDim2.new(0, 200, 0, 50)
+NameTag.AlwaysOnTop = true
+NameTag.StudsOffset = Vector3.new(0, 1.8, 0)
+local Tag = Instance.new("TextLabel", NameTag)
+Tag.Name = "Tag"
+Tag.BackgroundTransparency = 1
+Tag.Position = UDim2.new(0, -50, 0, 0)
+Tag.Size = UDim2.new(0, 300, 0, 20)
+Tag.TextSize = 15
+Tag.TextColor3 = Color3.new(100 / 255, 100 / 255, 100 / 255)
+Tag.TextStrokeColor3 = Color3.new(0 / 255, 0 / 255, 0 / 255)
+Tag.TextStrokeTransparency = 0.4
+Tag.Text = "nil"
+Tag.Font = Enum.Font.SourceSansBold
+Tag.TextScaled = false
+
+-- 创建血条的函数
+local function createHealthBar(character)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    -- 如果已有血条，删除旧的
+    local existingHealthBar = character:FindFirstChild("HealthBar")
+    if existingHealthBar then
+        existingHealthBar:Destroy()
+    end
+
+    -- 创建 BillboardGui
+    local healthBar = Instance.new("BillboardGui")
+    healthBar.Name = "HealthBar"
+    healthBar.Size = UDim2.new(0.2, 0, 2, 0)  -- 竖直的血条
+    healthBar.Adornee = character:FindFirstChild("HumanoidRootPart")
+    healthBar.StudsOffset = Vector3.new(-3, 0, 0)  -- 位置调整到左边
+    healthBar.AlwaysOnTop = true
+    healthBar.Parent = character
+
+    -- 创建背景框架
+    local bgFrame = Instance.new("Frame")
+    bgFrame.Size = UDim2.new(1, 0, 1, 0)
+    bgFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)  -- 黑色背景
+    bgFrame.BorderSizePixel = 0
+    bgFrame.Parent = healthBar
+
+    -- 创建前景框架用于血量显示
+    local barFrame = Instance.new("Frame")
+    barFrame.Size = UDim2.new(1, 0, humanoid.Health / humanoid.MaxHealth, 0)
+    barFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  -- 红色表示血量
+    barFrame.BorderSizePixel = 0
+    barFrame.AnchorPoint = Vector2.new(0, 1)  -- 从底部向上生长
+    barFrame.Position = UDim2.new(0, 0, 1, 0)
+    barFrame.Parent = bgFrame
+
+    -- 绑定血量变化事件
+    humanoid.HealthChanged:Connect(function(health)
+        barFrame.Size = UDim2.new(1, 0, health / humanoid.MaxHealth, 0)
+    end)
+end
+
+-- 创建工具显示的函数
+local function createToolsDisplay(character)
+    local toolsDisplay = character:FindFirstChild("ToolsDisplay")
+    if toolsDisplay then
+        toolsDisplay:Destroy()
+    end
+
+    toolsDisplay = Instance.new("BillboardGui")
+    toolsDisplay.Name = "ToolsDisplay"
+    toolsDisplay.Size = UDim2.new(0, 150, 0, 50)
+    toolsDisplay.Adornee = character:FindFirstChild("HumanoidRootPart")
+    toolsDisplay.StudsOffset = Vector3.new(0, -2, 0)  -- 位置略微下移
+    toolsDisplay.AlwaysOnTop = true
+    toolsDisplay.Parent = character
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "Tools: " .. table.concat(
+        (function()
+            local tools = {}
+            for _, item in pairs(character:GetChildren()) do
+                if item:IsA("Tool") then
+                    table.insert(tools, item.Name)
+                end
+            end
+            return tools
+        end)(), ", "
+    )
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.TextStrokeTransparency = 0.5
+    textLabel.TextScaled = false
+    textLabel.Font = Enum.Font.SourceSans
+    textLabel.TextSize = 14
+    textLabel.Parent = toolsDisplay
+end
+
+-- 控制 ESP 顯示開關
+local espEnabled = false  -- ESP 初始為關閉
+
+local function toggleESP(value)
+    espEnabled = value  -- 根據 Toggle 狀態設置 ESP
+
+    if espEnabled then
+        -- 開啟 ESP
+        for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                -- 這裡加上實際的 ESP 顯示邏輯
+                esp(v, _G.UseTeamColor and v.TeamColor.Color or ((game.Players.LocalPlayer.TeamColor == v.TeamColor) and _G.FriendColor or _G.EnemyColor))
+            end
+        end
+    else
+        -- 關閉 ESP
+        -- 這裡清除所有 ESP 物件
+        for i, v in pairs(game:GetService("Players"):GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                -- 移除已經存在的 ESP 元件
+                local highlight = v.Character:FindFirstChild("GetReal")
+                if highlight then
+                    highlight:Destroy()
+                end
+            end
+        end
+    end
+end
