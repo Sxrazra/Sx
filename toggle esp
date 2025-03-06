@@ -69,3 +69,13 @@ local function toggleESP(value)
         end
     end
 end
+
+-- 設定 Toggle 按鈕
+local Toggle1 = PageSection1:Toggle({
+    Name = "ESP", -- name, Name, title, Title
+    Default = false,
+    callback = function(value)
+        print(value)  -- 打印當前值，開啟/關閉狀態
+        toggleESP(value)  -- 根據 Toggle 值啟動或關閉 ESP
+    end
+})
